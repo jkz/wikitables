@@ -1,0 +1,14 @@
+{
+  "name": "",
+  "version": "0.0.0",
+  "devDependencies": {
+  },
+  "dependencies": {
+    "angular-unstable": "~1.1.5",
+    "angular-cookies": "~1.0.7",
+    "angular-kit": "jessethegame/angular-kit",
+    "angular-ui-router": "~0.0.1",
+    "angular-ui-utils": "~0.0.4",
+    "showdown": "~0.3.1"
+  }
+}
