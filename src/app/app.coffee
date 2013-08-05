@@ -1,33 +1,14 @@
 # Create all modules here
 
-angular.module '', [
-  'templates-app',
-  'templates-common',
+angular.module('wikitables', [
+  'templates-app'
+  'templates-common'
 
-  'ui.state',
-  'ui.route',
-  'ui.event',
-  'ui.keypress',
-
-  'ngCookies',
-  'titleService',
-  'urlencode-POST',
-
-  'kit',
-  'markdown',
-  'fuzzy',
-
-  'github'
-]
-
-# This is for Angular < 1.1
-# for more info see:
-# http://stackoverflow.com/questions/16661032/http-get-is-not-allowed-by-access-control-allow-origin-but-ajax-is
-.config ($httpProvider) ->
-  delete $httpProvider.defaults.headers.common['X-Requested-With']
+  'ui.state'
+  'ui.route'
+])
 
 .config ($stateProvider, $urlRouterProvider) ->
-
   # All non matching paths are redirected to /404.
   $urlRouterProvider
     .otherwise '/404'
@@ -36,12 +17,17 @@ angular.module '', [
     .state '404',
       url: '/404'
       templateUrl: '404.tpl.html'
+    .state 'page',
+      url: '/:page'
+      controller: 'WikiCtrl'
+      templateUrl: 'wiki/table.tpl.html'
+    .state 'welcome',
+      url: '/'
+      controller: 'WikiCtrl'
+      templateUrl: 'wiki/table.tpl.html'
 
 .run ($rootScope, $state, $stateParams) ->
   # Expose state parameters to the scope
   $rootScope.$state = $state
   $rootScope.$stateParams = $stateParams
-
-.controller 'AppCtrl', ($scope, $rootScope) ->
-  # pass
 

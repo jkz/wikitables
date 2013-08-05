@@ -1,0 +1,25 @@
+<div ng-show=!table class=loading></div>
+<table ng-show=table class="table table-striped table-bordered table-condensed">
+  <tr ng-repeat="(key, row) in table">
+    <th>
+      {{key}}
+    <th ng-show=!key ng-repeat="column in row track by $index">
+      {{column}}
+    <td ng-show=key ng-repeat="column in row track by $index">
+      {{column}}
+</table>
+
+<!--
+  <table class="table table-striped table-bordered table-condensed">
+    <tr>
+      <th>
+
+      <th ng-repeat="column in table.columns track by $index">
+        {{column}}
+    <tr ng-repeat="(key, row) in table.rows">
+      <th>
+        {{key}}
+      <td ng-repeat="column in table.columns track by $index">
+        {{row[column]}}
+  </table>
+  -->

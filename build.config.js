@@ -57,7 +57,8 @@ module.exports = {
       'vendor/angular-ui-utils/modules/event/event.js',
       'vendor/angular-ui-utils/modules/route/route.js',
       'vendor/angular-ui-utils/modules/keypress/keypress.js',
-      'vendor/showdown/compressed/showdown.js'
+      'vendor/showdown/compressed/showdown.js',
+      'vendor/table-to-json/lib/jquery.tabletojson.js'
     ],
     css: [
     ]
