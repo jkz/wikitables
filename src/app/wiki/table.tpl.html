@@ -17,19 +17,40 @@
 </table>
   -->
 
-<div ordered>
+<div ordered displayed>
+  <ul>
+    <li ng-repeat="d in data">{{d[''].content}}</li>
+  </ul>
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Display</h3>
+    </div>
+    <div class="btn-toolbar">
+      <div class="btn-group" ng-repeat="(column, _) in display.hidden track by column">
+        <button type="button" class="btn btn-default"
+         ng-click="display.show(column)">{{column}}</button>
+      </div>
+      <div class="btn-group">
+        <div class="btn btn-link" ng-click="display.reset()">reset</div>
+      </div>
+    </div>
+  </div>
+
   <div class="panel panel-primary">
     <div class="panel-heading">
       <h3 class="panel-title">Order</h3>
     </div>
     <div class="btn-toolbar">
-      <div class="btn-group" ng-repeat="predicate in order.predicates">
+      <div class="btn-group" ng-repeat="column in order.columns">
         <button type="button" class="btn btn-default"
-         ng-click="order.toggle(predicate)">{{ (predicate.up && '↑') || '↓' }}</button>
+         ng-click="order.toggle(column)">
+          {{ order.predicates[column] || '↕'}}
+        </button>
         <button type="button" class="btn btn-default"
-         ng-click="order.add(predicate)">{{predicate || 'Index'}}</button>
+         ng-click="order.promote(column)">{{column || 'Index'}}</button>
         <button type="button" class="btn btn-default"
-         ng-click="order.remove(predicate)">&times;</button>
+         ng-click="order.remove(column)">&times;</button>
       </div>
       <div class="btn-group">
         <div class="btn btn-link" ng-click="order.reset()">reset</div>
@@ -37,9 +58,32 @@
     </div>
   </div>
 
-  <filters>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Filters</h3>
+    </div>
 
-  </filters>
+    <form>
+      <select class="form-control col-lg-4">
+        <option>Column</option>
+        <option ng-repeat="column in table.columns track by $index">{{column}}</option>
+      </select>
+
+      <select class="form-control col-lg-4">
+        <option>Compare</option>
+      </select>
+
+      <select class="form-control col-lg-4">
+        <option>Value</option>
+      </select>
+    </form>
+
+    <div class="btn-toolbar">
+      <div class="btn-group">
+        <div class="btn btn-link" ng-click="order.reset()">reset</div>
+      </div>
+    </div>
+  </div>
 
   <div ng-show=!table class=loading></div>
   <table ng-show=table class="table table-bordered table-condensed">
@@ -48,14 +92,18 @@
         <a ng-click="order.add('')">
           Index
         </a>
-      <th ng-repeat="column in table.columns track by $index">
-        <a ng-click="order.add(column)">
-          {{column}}
-        </a>
-    <tr ng-repeat="row in table.rows | orderBy:order.getters:reverse">
+      <th ng-repeat="column in table.columns track by $index"
+        ng-show="!display.hidden[column]">
+        <button type=button class=close ng-click="display.hide(column)">&times;</button>
+        <button ng-click="order.add(column)">
+          {{ order.predicates[column] || '↕'}}
+        </button>
+        {{column}}
+    <tr ng-repeat="row in order.filter(table.rows)">
       <th>
         {{row[''].content}}
       <td ng-repeat="column in table.columns track by $index"
+        ng-show="!display.hidden[column]"
         ng-class="{
           success: row[column].color == 'success',
           warning: row[column].color == 'warning',

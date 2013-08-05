@@ -1,40 +1,51 @@
 angular.module('wikitables')
-.directive('ordered', ->
+.directive('ordered', ($filter) ->
   restrict: 'A'
   link: ($scope) ->
     order =
-      predicates: []
+      columns: []
+      predicates: {}
       getters: []
 
-    order.update = ->
-      order.getters = []
-      for p in order.predicates
-        ((scoped_p) ->
-          order.getters.push (obj) ->
-            obj[scoped_p]?.content
-        )(p)
+    order.update = (column) ->
+      (obj) ->
+        obj[column]?.content
 
-    order.add = (predicate) ->
+    order.promote = (column) ->
       # Ugily move the predicate to front
-      predicates = order.predicates
-      order.predicates = [predicate]
-      for p in predicates
-        if p isnt predicate
-          order.predicates.push p
-      order.update()
+      columns = order.columns
+      order.columns = [column]
+      for p in columns
+        if p isnt column
+          order.columns.push p
 
-    order.remove = (predicate) ->
+    order.toggle = (column) ->
+      order.predicates[column] = \
+        if order.predicates[column] == '↓' then '↑' else '↓'
+
+    order.remove = (column) ->
       # Ugily rebuild the predicates without given predicate
-      predicates = order.predicates
-      order.predicates = []
-      for p in predicates
-        if p isnt predicate
-          order.predicates.push p
-      order.update()
+      columns = order.columns
+      order.columns = []
+      for p in columns
+        if p isnt column
+          order.columns.push p
+      delete order.predicates[column]
+
+    order.add = (column) ->
+      order.promote column
+      order.toggle column
 
     order.reset = ->
-      order.predicates = []
+      order.predicates = {}
+      order.columns = []
       order.add ''
+
+    order.filter = (data) ->
+      for column in order.columns[..].reverse()
+        data = $filter('orderBy')(data, ((obj) -> obj[column]?.content),
+          order.predicates[column] == '↑')
+      return data
 
     order.reset()
 
