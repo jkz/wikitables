@@ -1,12 +1,18 @@
 <div ng-show=!table class=loading></div>
-<table ng-show=table class="table table-striped table-bordered table-condensed">
+<table ng-show=table class="table table-bordered table-condensed">
   <tr ng-repeat="(key, row) in table">
     <th>
       {{key}}
     <th ng-show=!key ng-repeat="column in row track by $index">
-      {{column}}
-    <td ng-show=key ng-repeat="column in row track by $index">
-      {{column}}
+      {{column.text}}
+    <td ng-show=key ng-repeat="column in row track by $index"
+    ng-class="{
+      success: column.color == 'success',
+      warning: column.color == 'warning',
+      danger: column.color == 'danger',
+      active: column.color == 'unknown' || !column
+    }">
+      {{column.text}}
 </table>
 
 <!--

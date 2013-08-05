@@ -64,9 +64,18 @@ angular.module('wikitables')
           # Add a new row for the key
           rows[key] = []
           tds.each (i, td) ->
+            td = $(td)
             # Add all value columns to the row (so don't add the key column)
             if i
-              rows[key].push($(td).text())
+              if td.hasClass 'table-yes'
+                color = 'success'
+              else if td.hasClass 'table-partial'
+                color = 'warning'
+              else if td.hasClass 'table-no'
+                color = 'danger'
+              else if td.hasClass 'table-unknown'
+                color = 'unknown'
+              rows[key].push text: td.text(), color: color
           console.log tds.length
 
       return rows
@@ -136,24 +145,13 @@ angular.module('wikitables')
   return wikitables
 )
 
-.controller('WikiCtrl', ($scope, wikitables, $http, $stateParams) ->
+.controller('WikiCtrl', ($scope, $rootScope, wikitables, $http, $stateParams) ->
   $scope.table = undefined
-
-  ###
-  page = 'Comparison_of_revision_control_software'
-
-  $http.get('/assets/api/sample.json')
-  .success (data) ->
-    $scope.table = wikitables.build data.parse.text['*'], false
-
-  $http.get('/assets/api/sample.json')
-  .success (data) ->
-    $scope.rows = wikitables.build data.parse.text['*'], true
-  ###
 
   wikitables.get($stateParams.page)
   .success (data) ->
     if data
+      $rootScope.title = data.parse.title
       $scope.table = wikitables.build data.parse.text['*']
 )
 
