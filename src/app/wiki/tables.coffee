@@ -12,20 +12,43 @@ angular.module('wikitables')
         }
       )
 
-  linkmark = /\s*\[[^\]]\]\s*$/i
+  re =
+    number: /^\d*(,\d\d\d)*\+?$/
+    annotation: /\s*\[([^\]]+)\]\s*$/i
+    note: /n (\d)+/
+    link: /\d+/
 
   parse =
     cell: (cell) ->
-      # Add all value columns to the row (so don't add the key column)
-      text = $.trim(cell.text())
+      # Integer columns seem to have an incisiable span that messes up the
+      # value. We remove those here
+      cell.find('span[style="display:none"]').remove()
 
-      # '?' cells are set to undefined
-      if not text or text == '?'
+      # Start off with the trimmed text
+      original = $.trim(cell.text())
+      content = original
+
+      # empty and '?' cells are set to undefined
+      if not content or content == '?'
         return
 
-      while linkmark.test(text)
-        text = text.replace linkmark, ''
+      # Annotations like [1] and [n 23] are removed from the content here
+      #TODO parse the annotations and add them to the cell
+      annotations =
+        links: []
+        notes: []
+      while re.annotation.test(content)
+        annotation = parseInt re.annotation.exec(content)[1]
+        #TODO match various link types and add them to `links`
+        content = content.replace re.annotation, ''
 
+      # First check for date values
+      # Numerical values are stored as integer rather than strings
+      #TODO support floating point numbers
+      if re.number.test content
+        text = parseInt content.replace /,/, ''
+
+      # The cell class is inspected for colors
       if cell.hasClass 'table-yes'
         color = 'success'
       else if cell.hasClass 'table-partial'
@@ -35,7 +58,10 @@ angular.module('wikitables')
       else if cell.hasClass 'table-unknown'
         color = 'unknown'
 
-      return text: text, color: color
+      content: content
+      color: color
+      annotations: annotations
+      original: original
 
   parse.array = (table) ->
     rows = {}
@@ -58,8 +84,7 @@ angular.module('wikitables')
           td = $(td)
           # Add all value columns to the row (so don't add the key column)
           if i
-            rows[key].push wikitables.parse.cell td
-        console.log tds.length
+            rows[key].push wikitables.parse.cell t
 
     return rows
 
@@ -89,6 +114,7 @@ angular.module('wikitables')
 
           tds.each (i, td) ->
             if i
+              # Column indices are 1 behind row indices because of pk
               rows[key][columns[i - 1]] = parse.cell $(td)
 
     return columns: columns, rows:rows
@@ -145,7 +171,7 @@ angular.module('wikitables')
       objectRows = []
 
       for key, row of rows
-        row[''] = text: key
+        row[''] = content: key
         objectRows.push(row)
 
       return columns: columns, rows: objectRows
@@ -175,5 +201,6 @@ angular.module('wikitables')
     if data
       $rootScope.title = data.parse.title
       $scope.table = wikitables.build data.parse.text['*']
-      console.log $scope.table
+      $scope.links = data.parse.externallinks
+      console.log data.parse
 )

@@ -2,26 +2,41 @@ angular.module('wikitables')
 .directive('ordered', ->
   restrict: 'A'
   link: ($scope) ->
-    $scope.predicates = []
+    order =
+      predicates: []
+      getters: []
 
-    orderGetter = ->
-      getters = []
-      for p in $scope.predicates
+    order.update = ->
+      order.getters = []
+      for p in order.predicates
         ((scoped_p) ->
-          getters.push (obj) ->
-            obj[scoped_p]?.text
+          order.getters.push (obj) ->
+            obj[scoped_p]?.content
         )(p)
-      $scope.predicateGetters = getters
 
-    $scope.orderSetter = (predicate) ->
+    order.add = (predicate) ->
       # Ugily move the predicate to front
-      console.log 'predicate', predicate
-      predicates = $scope.predicates
-      $scope.predicates = [predicate]
+      predicates = order.predicates
+      order.predicates = [predicate]
       for p in predicates
         if p isnt predicate
-          $scope.predicates.push p
-      orderGetter()
+          order.predicates.push p
+      order.update()
 
-    $scope.orderSetter ''
+    order.remove = (predicate) ->
+      # Ugily rebuild the predicates without given predicate
+      predicates = order.predicates
+      order.predicates = []
+      for p in predicates
+        if p isnt predicate
+          order.predicates.push p
+      order.update()
+
+    order.reset = ->
+      order.predicates = []
+      order.add ''
+
+    order.reset()
+
+    $scope.order = order
 )
