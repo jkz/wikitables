@@ -8,6 +8,10 @@ angular.module('wikitables', [
   'ui.route'
 ])
 
+.service '_', ($window) ->
+  $window._
+
+
 .config ($stateProvider, $urlRouterProvider) ->
   # All non matching paths are redirected to /404.
   $urlRouterProvider
@@ -30,4 +34,3 @@ angular.module('wikitables', [
   # Expose state parameters to the scope
   $rootScope.$state = $state
   $rootScope.$stateParams = $stateParams
-

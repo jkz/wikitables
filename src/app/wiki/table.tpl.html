@@ -1,11 +1,13 @@
 <div ng-show=!table class=loading></div>
-<table ng-show=table class="table table-bordered table-condensed">
-  <tr ng-repeat="(key, row) in table">
+<!--
+<table ng-show=table ordered class="table table-bordered table-condensed">
+  <tr ng-repeat="row in table | orderBy:predicates:reverse">
     <th>
-      {{key}}
-    <th ng-show=!key ng-repeat="column in row track by $index">
-      {{column.text}}
-    <td ng-show=key ng-repeat="column in row track by $index"
+    <th ng-show="!$parent.$index" ng-repeat="column in row track by $index">
+      <a ng-click="orderSetter(column.text)">
+        {{column.text}}
+      </a>
+    <td ng-show="$parent.$index" ng-repeat="column in row track by $index"
     ng-class="{
       success: column.color == 'success',
       warning: column.color == 'warning',
@@ -14,18 +16,27 @@
     }">
       {{column.text}}
 </table>
+  -->
 
-<!--
-  <table class="table table-striped table-bordered table-condensed">
+  <table ordered ng-show=table class="table table-bordered table-condensed">
     <tr>
       <th>
-
+        <a ng-click="orderSetter('')">
+          Index
+        </a>
       <th ng-repeat="column in table.columns track by $index">
-        {{column}}
-    <tr ng-repeat="(key, row) in table.rows">
+        <a ng-click="orderSetter(column)">
+          {{column}}
+        </a>
+    <tr ng-repeat="row in table.rows | orderBy:predicateGetters:reverse">
       <th>
-        {{key}}
-      <td ng-repeat="column in table.columns track by $index">
-        {{row[column]}}
+        {{row[''].text}}
+      <td ng-repeat="column in table.columns track by $index"
+        ng-class="{
+          success: row[column].color == 'success',
+          warning: row[column].color == 'warning',
+          danger: row[column].color == 'danger',
+          active: row[column].color == 'unknown' || !row[column]
+        }">
+        {{row[column].text}}
   </table>
-  -->

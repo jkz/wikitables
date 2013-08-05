@@ -12,7 +12,89 @@ angular.module('wikitables')
         }
       )
 
-    join_arrays: (tables) ->
+  linkmark = /\s*\[[^\]]\]\s*$/i
+
+  parse =
+    cell: (cell) ->
+      # Add all value columns to the row (so don't add the key column)
+      text = $.trim(cell.text())
+
+      # '?' cells are set to undefined
+      if not text or text == '?'
+        return
+
+      while linkmark.test(text)
+        text = text.replace linkmark, ''
+
+      if cell.hasClass 'table-yes'
+        color = 'success'
+      else if cell.hasClass 'table-partial'
+        color = 'warning'
+      else if cell.hasClass 'table-no'
+        color = 'danger'
+      else if cell.hasClass 'table-unknown'
+        color = 'unknown'
+
+      return text: text, color: color
+
+  parse.array = (table) ->
+    rows = {}
+
+    $(table).find('tbody').children().each (index, tr) ->
+      tr = $(tr)
+
+      if not index or not tr.hasClass 'sortable'
+        # Select all direct children (wikis are not to be trusted to provide
+        # the excepted tags)
+        tds = tr.children()
+
+        # The first row contains the headers and has '' as key
+        # The other rows have their identifier as key
+        key = if index then tds.first().text() else ''
+
+        # Add a new row for the key
+        rows[key] = []
+        tds.each (i, td) ->
+          td = $(td)
+          # Add all value columns to the row (so don't add the key column)
+          if i
+            rows[key].push wikitables.parse.cell td
+        console.log tds.length
+
+    return rows
+
+  parse.object = (table) ->
+    columns = []
+    rows = {}
+    $(table).find('tbody').children().each (index, tr) ->
+      tr = $(tr)
+
+      if not index or not tr.hasClass 'sortable'
+        # Select all direct children (wikis are not to be trusted to provide
+        # the excepted tags)
+        tds = tr.children()
+
+        # The first iteration is over the table header and puts the given
+        # keys in an array
+        if not index
+          tds.each (i, td) ->
+            if i
+              columns.push($(td).text())
+
+        # The other iterations build objects with the keys taken above
+        else
+          key = tds.first().text()
+
+          rows[key] = {}
+
+          tds.each (i, td) ->
+            if i
+              rows[key][columns[i - 1]] = parse.cell $(td)
+
+    return columns: columns, rows:rows
+
+  join =
+    array: (tables) ->
       # The container for final joined row data. New rows are inserted
       # by their keys, their values are arrays which get extended
       rows = {}
@@ -44,43 +126,14 @@ angular.module('wikitables')
         # Update the prefix with to match the current size
         prefix = prefix.concat suffix
 
-      return rows
+      arrayRows = []
 
-    parse_array: (table) ->
-      rows = {}
+      for key, row of rows
+        arrayRows.push([key].concat row)
 
-      $(table).find('tbody').children().each (index, tr) ->
-        tr = $(tr)
+      return arrayRows
 
-        if not index or not tr.hasClass 'sortable'
-          # Select all direct children (wikis are not to be trusted to provide
-          # the excepted tags)
-          tds = tr.children()
-
-          # The first row contains the headers and has '' as key
-          # The other rows have their identifier as key
-          key = if index then tds.first().text() else ''
-
-          # Add a new row for the key
-          rows[key] = []
-          tds.each (i, td) ->
-            td = $(td)
-            # Add all value columns to the row (so don't add the key column)
-            if i
-              if td.hasClass 'table-yes'
-                color = 'success'
-              else if td.hasClass 'table-partial'
-                color = 'warning'
-              else if td.hasClass 'table-no'
-                color = 'danger'
-              else if td.hasClass 'table-unknown'
-                color = 'unknown'
-              rows[key].push text: td.text(), color: color
-          console.log tds.length
-
-      return rows
-
-    join_objects: (tables) ->
+    object: (tables) ->
       columns = []
       rows = {}
       # Concatenate all key arrays and extend all row objects
@@ -88,59 +141,28 @@ angular.module('wikitables')
         columns = columns.concat(table.columns)
         for key, row of table.rows
           rows[key] = angular.extend(rows[key] or {}, row)
-      return columns: columns, rows: rows
 
-    parse_object: (table) ->
-      columns = []
-      rows = {}
-      $(table).find('tbody').children().each (index, tr) ->
-        tr = $(tr)
+      objectRows = []
 
-        if not index or not tr.hasClass 'sortable'
-          # Select all direct children (wikis are not to be trusted to provide
-          # the excepted tags)
-          tds = tr.children()
+      for key, row of rows
+        row[''] = text: key
+        objectRows.push(row)
 
-          # The first iteration is over the table header and puts the given
-          # keys in an array
-          if not index
-            tds.each (i, td) ->
-              if i
-                columns.push($(td).text())
+      return columns: columns, rows: objectRows
 
-          # The other iterations build objects with the keys taken above
-          else
-            key = tds.first().text()
-
-            rows[key] = {}
-
-            tds.each (i, td) ->
-              if i
-                rows[key][columns[i]] = $(td).text()
-
-      return columns: columns, rows:rows
-
-  wikitables.join = (tables, as_array = true) ->
-    if as_array
-      wikitables.join_arrays tables
-    else
-      wikitables.join_objects tables
-
-  wikitables.parse = (table, as_array = true) ->
-    if as_array
-      wikitables.parse_array table
-    else
-      wikitables.parse_object table
-
-  wikitables.build = (text, as_array = true) ->
+  wikitables.build = (text, type = 'object') ->
     tables = []
     element = $('<div>')
     element
     .html(text)
     .find('.wikitable').each (index, table) ->
-      rows = wikitables.parse table, as_array
+      rows = parse[type] table
       tables.push rows
-    wikitables.join tables, as_array
+    console.log 'join', join
+    join[type] tables
+
+  wikitables.parse = parse
+  wikitables.join = join
 
   return wikitables
 )
@@ -153,19 +175,5 @@ angular.module('wikitables')
     if data
       $rootScope.title = data.parse.title
       $scope.table = wikitables.build data.parse.text['*']
-)
-
-.directive('wikitable', (wikitables) ->
-  restrict: 'E',
-  scope:
-    page: '='
-  link: ($scope, $element) ->
-    $scope.tables = []
-    wikitables.get($scope.page)
-    .success (data) ->
-      text = data.parse.text['*']
-      $element.html(text)
-      $element.find('.wikitable').each (index, table) ->
-        $scope.tables.push $(table).tableToJSON ignoreHiddenRows: false
-      joined = wikitables.join $scope.tables, 'Software'
+      console.log $scope.table
 )
