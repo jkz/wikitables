@@ -1,23 +1,50 @@
-<!--
-<table ng-show=table ordered class="table table-bordered table-condensed">
-  <tr ng-repeat="row in table | orderBy:predicates:reverse">
-    <th>
-    <th ng-show="!$parent.$index" ng-repeat="column in row track by $index">
-      <a ng-click="orderSetter(column.text)">
-        {{column.text}}
-      </a>
-    <td ng-show="$parent.$index" ng-repeat="column in row track by $index"
-    ng-class="{
-      success: column.color == 'success',
-      warning: column.color == 'warning',
-      danger: column.color == 'danger',
-      active: column.color == 'unknown' || !column
-    }">
-      {{column.text}}
-</table>
-  -->
+<div class=foo>
+  <div>
+    <div>
+      <a>Violets equals Blue</a>
+        </div>
+        <a>OR</a>
+        <div>
+      <a>Roses equals Red</a>
+    </div>
+  </div>
+  <a>AND</a>
+  <div>
+    <div>
+      <div>
+        <div>
+          <a>Hi equals greet</a>
+        </div>
+        <a>OR</a>
+        <div>
+          <a>Bye of my feet</a>
+        </div>
+      </div>
+      <a>OR</a>
+      <div>
+        <a>I let you up</a>
+      </div>
+    </div>
+    <a>AND</a>
+    <div>
+      <div>
+        <a>I gave you all</a>
+      </div>
+      <a>OR</a>
+      <div>
+        <a>So return to me</a>
+      </div>
+    </div>
+  </div>
+  <a>AND</a>
+  <div>
+    <a>So we can fall</a>
+  </div>
+</div>
 
-<div ordered displayed>
+<div class=hide ordered displayed filtered>
+  {{filters}}
+
   <ul>
     <li ng-repeat="d in data">{{d[''].content}}</li>
   </ul>
@@ -63,26 +90,31 @@
       <h3 class="panel-title">Filters</h3>
     </div>
 
-    <form>
-      <select class="form-control col-lg-4">
-        <option>Column</option>
-        <option ng-repeat="column in table.columns track by $index">{{column}}</option>
-      </select>
-
-      <select class="form-control col-lg-4">
-        <option>Compare</option>
-      </select>
-
-      <select class="form-control col-lg-4">
-        <option>Value</option>
-      </select>
-    </form>
-
-    <div class="btn-toolbar">
-      <div class="btn-group">
-        <div class="btn btn-link" ng-click="order.reset()">reset</div>
+    <div class="row">
+      <div class="row col-lg-9" filter="filters.new"></div>
+      <div class="col-lg-3 btn-toolbar">
+        <div class="btn-group vertical-space">
+          <button ng-click="filters.add()" type="button" class="btn btn-success">AND</button>
+          <button ng-click="filters.add()" type="button" class="btn btn-success">OR</button>
+        </div>
       </div>
     </div>
+
+    <div class="row">
+      <div ng-repeat="filter in filters.all">
+        <div class="row top-buffer col-lg-9" filter="filter"></div>
+        <div class="top-buffer col-lg-3 btn-toolbar">
+          <div class="btn-group vertical-space">
+            <button ng-click="filters.add()" type="button" class="btn btn-success">AND</button>
+            <button ng-click="filters.add()" type="button" class="btn btn-success">OR</button>
+            <button ng-click="filters.remove($index)" type="button" class="btn btn-default">&times;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn btn-link" ng-click="filters.reset()">reset</div>
+
   </div>
 
   <div ng-show=!table class=loading></div>
@@ -99,7 +131,7 @@
           {{ order.predicates[column] || '↕'}}
         </button>
         {{column}}
-    <tr ng-repeat="row in order.filter(table.rows)">
+    <tr ng-show="filters.execute.all(row)" ng-repeat="row in order.execute(table.rows)">
       <th>
         {{row[''].content}}
       <td ng-repeat="column in table.columns track by $index"

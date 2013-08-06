@@ -193,7 +193,7 @@ angular.module('wikitables')
   return wikitables
 )
 
-.controller('WikiCtrl', ($scope, $rootScope, wikitables, $http, $stateParams) ->
+.controller('WikiCtrl', ($scope, $rootScope, wikitables, $stateParams) ->
   $scope.table = undefined
 
   wikitables.get($stateParams.page)

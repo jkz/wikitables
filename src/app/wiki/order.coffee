@@ -41,7 +41,7 @@ angular.module('wikitables')
       order.columns = []
       order.add ''
 
-    order.filter = (data) ->
+    order.execute = (data) ->
       for column in order.columns[..].reverse()
         data = $filter('orderBy')(data, ((obj) -> obj[column]?.content),
           order.predicates[column] == '↑')

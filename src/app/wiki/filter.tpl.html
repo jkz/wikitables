@@ -1,0 +1,22 @@
+<div class=col-lg-4>
+  <select ng-model="filter.column" class="form-control">
+    <option ng-repeat="column in $parent.table.columns track by $index">{{column}}</option>
+  </select>
+</div>
+
+<div class="col-lg-2 btn-group">
+  <label class="btn btn-danger">
+    <input class="hide" ng-model="filter.not" type="checkbox">
+    <span ng-class="">NOT{{(filter.not && '!') || '?'}}</span>
+  </label>
+</div>
+
+<div class=col-lg-2>
+  <select ng-model="filter.cmp" class="form-control">
+    <option ng-repeat="(name, cmp) in $parent.filters.comperators">{{name}}</option>
+  </select>
+</div>
+
+<div class=col-lg-4>
+  <input ng-model="filter.value" type="text" class="form-control">
+</div>

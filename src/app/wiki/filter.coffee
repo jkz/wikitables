@@ -2,47 +2,56 @@ angular.module('wikitables')
 .directive('filtered', ->
   restrict: 'A'
   link: ($scope) ->
-    filter:
-      AND: -> (left, right) ->
-        (data) ->
-            left(data) && right(data)
+    filters =
+      all: []
+      new: {}
+      regex: {}
 
-      OR: -> (left, right) ->
-        (data) ->
-            left(data) || right(data)
+    filters.add = ->
+      filters.all.push filters.new
+      filters.new = {}
 
-    class Filter
-      constructor: (@column, @value) ->
+    filters.execute =
+      one: (f, row) ->
+        if filters.comperators[f.cmp]? row[f.column]?.content, f.value
+          not f.not
+        else
+          f.not
 
-      run: (row) ->
-        @cmp row[column]
+    filters.build = (column, cmp, val) ->
+      filters.all.push (row) ->
+        cmp row[column]?.content, val
 
-      cmp: (val) ->
-        true
+    filters.remove = (index) ->
+      filters.all = filters.all.splice index, 1
 
+    filters.comperators =
+      'equals': (x, y) -> x == y
+      #XXX this is far from optimal
+      'matches': (x, y) -> new RegExp(y).test(x)
+      '>': (x, y) -> x > y
+      '>=': (x, y) -> x >= y
+      '<': (x, y) -> x < y
+      '<=': (x, y) -> x <= y
 
-    class eq extends Filter
-      cmp: (val) ->
-        val is @val
+    filters.connectives =
+      AND: (x, y) -> (z) -> x z and y z
+      OR: (x, y) -> (z) -> x z or y z
 
-    class gt extends Filter
-      cmp: (val) ->
-        val > @val
+    filters.execute.all = (row) ->
+      for filter in filters.all
+        if not filters.execute.one(filter, row)
+          return false
+      return true
 
-    class gte extends Filter
-      cmp: (val) ->
-        val >= @val
+    filters.reset = ->
+      filters.all = []
 
-    class lt extends Filter
-      cmp: (val) ->
-        val < @val
-
-    class lte extends Filter
-      cmp: (val) ->
-        val <= @val
-
-    class regex extends Filter
-      cmp: (val) ->
-        @val.test(val)
-
+    $scope.filters = filters
+)
+.directive('filter', ->
+  restrice: 'A'
+  templateUrl: 'wiki/filter.tpl.html'
+  scope:
+    filter: '='
 )
