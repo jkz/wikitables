@@ -1,72 +1,40 @@
-<div class=foo>
-  <div>
-    <div>
-      <a>Violets equals Blue</a>
-        </div>
-        <a>OR</a>
-        <div>
-      <a>Roses equals Red</a>
-    </div>
-  </div>
-  <a>AND</a>
-  <div>
-    <div>
-      <div>
-        <div>
-          <a>Hi equals greet</a>
-        </div>
-        <a>OR</a>
-        <div>
-          <a>Bye of my feet</a>
-        </div>
-      </div>
-      <a>OR</a>
-      <div>
-        <a>I let you up</a>
-      </div>
-    </div>
-    <a>AND</a>
-    <div>
-      <div>
-        <a>I gave you all</a>
-      </div>
-      <a>OR</a>
-      <div>
-        <a>So return to me</a>
-      </div>
-    </div>
-  </div>
-  <a>AND</a>
-  <div>
-    <a>So we can fall</a>
-  </div>
-</div>
-
-<div class=hide ordered displayed filtered>
+<div>
   {{filters}}
 
   <ul>
     <li ng-repeat="d in data">{{d[''].content}}</li>
   </ul>
 
-  <div class="panel panel-primary">
+  <div class="panel panel-primary" ng-hide="display.hide">
     <div class="panel-heading">
-      <h3 class="panel-title">Display</h3>
+      <h3 class="panel-title">
+        Settings
+        <div class="pull-right">
+          <span ng-click="display.fold = !display.fold">fold</span>
+          <span ng-click="display.reset()">reset</span>
+        </div>
+      </h3>
     </div>
     <div class="btn-toolbar">
       <div class="btn-group" ng-repeat="(column, _) in display.hidden track by column">
         <button type="button" class="btn btn-default"
          ng-click="display.show(column)">{{column}}</button>
       </div>
-      <div class="btn-group">
+      <div class="btn-group pull-right">
         <div class="btn btn-link" ng-click="display.reset()">reset</div>
       </div>
     </div>
   </div>
 
-  <div class="panel panel-primary">
+  <div class="panel panel-primary" ng-hide="order.hide">
     <div class="panel-heading">
-      <h3 class="panel-title">Order</h3>
+      <h3 class="panel-title">
+        Sort
+        <div class="pull-right">
+          <span ng-click="order.hide = !order.hide">hide</span>
+          <span ng-click="order.reset()">reset</span>
+        </div>
+      </h3>
     </div>
     <div class="btn-toolbar">
       <div class="btn-group" ng-repeat="column in order.columns">
@@ -79,41 +47,23 @@
         <button type="button" class="btn btn-default"
          ng-click="order.remove(column)">&times;</button>
       </div>
-      <div class="btn-group">
-        <div class="btn btn-link" ng-click="order.reset()">reset</div>
-      </div>
     </div>
   </div>
 
-  <div class="panel panel-primary">
+  <div class="panel panel-primary" ng-hide="filters.hide">
     <div class="panel-heading">
-      <h3 class="panel-title">Filters</h3>
-    </div>
-
-    <div class="row">
-      <div class="row col-lg-9" filter="filters.new"></div>
-      <div class="col-lg-3 btn-toolbar">
-        <div class="btn-group vertical-space">
-          <button ng-click="filters.add()" type="button" class="btn btn-success">AND</button>
-          <button ng-click="filters.add()" type="button" class="btn btn-success">OR</button>
+      <h3 class="panel-title">
+        Filters
+        <div class="pull-right">
+          <span ng-click="filters.hide = !filters.hide">hide</span>
+          <span ng-click="filters.reset()">reset</span>
         </div>
-      </div>
+      </h3>
     </div>
 
-    <div class="row">
-      <div ng-repeat="filter in filters.all">
-        <div class="row top-buffer col-lg-9" filter="filter"></div>
-        <div class="top-buffer col-lg-3 btn-toolbar">
-          <div class="btn-group vertical-space">
-            <button ng-click="filters.add()" type="button" class="btn btn-success">AND</button>
-            <button ng-click="filters.add()" type="button" class="btn btn-success">OR</button>
-            <button ng-click="filters.remove($index)" type="button" class="btn btn-default">&times;</button>
-          </div>
-        </div>
-      </div>
+    <div>
+      <filter-tree class="row" node="filters.root" filters="filters" table="table"></filter-tree>
     </div>
-
-    <div class="btn btn-link" ng-click="filters.reset()">reset</div>
 
   </div>
 
@@ -131,7 +81,7 @@
           {{ order.predicates[column] || '↕'}}
         </button>
         {{column}}
-    <tr ng-show="filters.execute.all(row)" ng-repeat="row in order.execute(table.rows)">
+    <tr ng-show="filters.execute(row)" ng-repeat="row in order.execute(table.rows)">
       <th>
         {{row[''].content}}
       <td ng-repeat="column in table.columns track by $index"

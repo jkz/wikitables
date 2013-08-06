@@ -1,19 +1,19 @@
 <div class=col-lg-4>
   <select ng-model="filter.column" class="form-control">
-    <option ng-repeat="column in $parent.table.columns track by $index">{{column}}</option>
+    <option ng-repeat="column in table.columns track by $index">{{column}}</option>
   </select>
 </div>
 
 <div class="col-lg-2 btn-group">
-  <label class="btn btn-danger">
+  <label class="btn btn-danger" ng-class="{inactive: !filter.not}">
     <input class="hide" ng-model="filter.not" type="checkbox">
-    <span ng-class="">NOT{{(filter.not && '!') || '?'}}</span>
+    <span>NOT</span>
   </label>
 </div>
 
 <div class=col-lg-2>
   <select ng-model="filter.cmp" class="form-control">
-    <option ng-repeat="(name, cmp) in $parent.filters.comperators">{{name}}</option>
+    <option ng-repeat="(name, cmp) in filters.tests">{{name}}</option>
   </select>
 </div>
 

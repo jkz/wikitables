@@ -201,6 +201,7 @@ angular.module('wikitables')
     if data
       $rootScope.title = data.parse.title
       $scope.table = wikitables.build data.parse.text['*']
+      $rootScope.table = wikitables.build data.parse.text['*']
       $scope.links = data.parse.externallinks
       console.log data.parse
 )

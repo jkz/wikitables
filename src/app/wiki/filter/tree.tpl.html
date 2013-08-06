@@ -1,0 +1,13 @@
+<div class="node clearfix" ng-if="node.gate">
+    <filter-tree node="node.left" filters="filters" table="table"></filter-tree>
+    <div class="gate clearfix">
+        <div class="name">{{node.gate}}</div>
+        <filter-branch class="pull-right" node="node" filters="filters"></filter-branch>
+    </div>
+    <filter-tree node="node.right" filters="filters" table="table"></filter-tree>
+</div>
+
+<div class="leaf clearfix" ng-if="!node.gate">
+    <filter-leaf class="col-lg-9" node="node" filters="filters" table="table"></filter-leaf>
+    <filter-branch class="off-col-lg-3" node="node" filters="filters"></filter-branch>
+</div>

@@ -36,7 +36,17 @@
     <script type="text/javascript" src="<%= file %>"></script><% }); %>
 
   </head>
-  <body>
+  <body displayed ordered filtered>
+
+    <header class="navbar navbar-fixed-top">
+      <a class="navbar-brand" href="#">Wikitables</a>
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a ng-click="display.hide = !display.hide">Conf</a></li>
+        <li><a ng-click="order.hide = !order.hide">Sort</a></li>
+        <li><a ng-click="filters.hide = !filters.hide">Filter</a></li>
+      </ul>
+    </header>
 
     <div ui-view></div>
 

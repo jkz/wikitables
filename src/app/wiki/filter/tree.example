@@ -1,0 +1,44 @@
+<div class="foo hide">
+  <div>
+    <div>
+      <a>Violets equals Blue</a>
+        </div>
+        <a>OR</a>
+        <div>
+      <a>Roses equals Red</a>
+    </div>
+  </div>
+  <a>AND</a>
+  <div>
+    <div>
+      <div>
+        <div>
+          <a>Hi equals greet</a>
+        </div>
+        <a>OR</a>
+        <div>
+          <a>Bye of my feet</a>
+        </div>
+      </div>
+      <a>OR</a>
+      <div>
+        <a>I let you up</a>
+      </div>
+    </div>
+    <a>AND</a>
+    <div>
+      <div>
+        <a>I gave you all</a>
+      </div>
+      <a>OR</a>
+      <div>
+        <a>So return to me</a>
+      </div>
+    </div>
+  </div>
+  <a>AND</a>
+  <div>
+    <a>So we can fall</a>
+  </div>
+</div>
+

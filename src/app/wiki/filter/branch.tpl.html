@@ -1,0 +1,5 @@
+<div class="btn-group">
+  <button ng-repeat="(gate, _) in filters.gates" ng-click="filters.insert(node, gate)"
+   type="button" class="btn btn-success">{{gate}}</button>
+  <button type="button" class="btn btn-default" ng-click="order.remove(column)">&times;</button>
+</div>
